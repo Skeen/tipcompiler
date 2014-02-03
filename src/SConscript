@@ -1,0 +1,37 @@
+Import(['env'])
+
+tmpEnv = env.Clone()
+env.Append(CXXFLAGS="-isystem include")
+
+sources = Glob("*.cpp")
+
+include = [
+    '#/src',
+    '.'
+]
+
+libpaths = [
+    '#/libs'
+]
+
+libraries = [
+#    'boost_program_options'
+]
+
+env['CPPPATH'] = include
+tmpEnv['LIBS'] = libraries
+tmpEnv['LIBPATH'] = libpaths
+
+object_list = env.Object(source = sources)
+
+task_name = 'Compiler.exe'
+tmpEnv.jAlias('BuildCompiler', task_name, "Compiles and links the compiler")
+tmpEnv.Depends(task_name, Glob("*.h"))
+tmpEnv.Depends(task_name, Glob("*.hpp"))
+tmpEnv.Program(task_name, object_list)
+
+run_program = 'Run_Program'
+tmpEnv.jAlias('Run', run_program, "Runs the compiler")
+tmpEnv.Command(run_program, None, "./build/src/Compiler.exe input/Body.java")
+tmpEnv.Depends(run_program, task_name)
+
